@@ -7,9 +7,7 @@ __author__ = 'Chris Roxby'
 # based on multiple Ceaser Ciphers in the style of the Enigma machine.
 # https://en.wikipedia.org/wiki/Enigma_machine
 ##
-# TODO: Possibly add a plugboard, allowing any pair of letters to trade places.
-# In practice: Any occurance of the letter will trade places
-# with its partner before and after the substitution.
+# TODO: Read settings from INI or similar
 
 from string import ascii_uppercase as ALPHABET
 from collections import deque
@@ -25,7 +23,68 @@ from collections import deque
 # Enter any number of numbers here.
 Rotors = (8, 6, 16, -5, 3)
 
+##
+# Enigma machines had a board with plugs
+# for each letter. Running a wire from
+# one letter to another would cause
+# the letters to trade themselves in
+# the machine.
+# Typically, 10 wires were used.
+# The mathematical maximum is 13.
+##
+# Invalid plugs, such as those that re-use
+# a letter will produce results that
+# can't be decrypted correctly.
+##
+# All of these examples are valid.
+#Plugs = () # No wires
+#Plugs = ('F', 'T') # One wire
+Plugs = (('F', 'T'), ('J', 'K')) # Multiple wires
+# 13 wires
+#Plugs = (('A', 'B'), ('C', 'D'), ('E', 'F'), ('G', 'H'),
+#         ('I', 'J'), ('K', 'L'), ('M', 'N'), ('O', 'P'),
+#         ('Q', 'R'), ('S', 'T'), ('U', 'V'), ('W', 'X'), ('Y', 'Z'))
+
 Run = True # The program stops when this is false.
+
+# Returns the specified letter's
+# partner on the plugboard.
+# Returns the letter otherwise.
+def Trade(letter):
+    # Open each pair in the
+    # plugboard settings
+    for pairing in Plugs:
+    # This will silently fail
+    # when Plugs is empty.
+
+        # Python needs to know
+        # if the array contains
+        # even more arrays.
+        if (len(pairing) > 1):
+            p0 = pairing[0]
+            p1 = pairing[1]
+        else:
+            p0 = Plugs[0]
+            p1 = Plugs[1]
+        # This means that the "else"
+        # code will run with a
+        # one wire setting
+        # and the "if" code will run
+        # with multiple wires.
+
+        # If the letter in the beginning of the pair
+        if (letter.upper() == p0.upper()):
+            # Return the other letter.
+            return(p1.upper())
+
+        # If the letter in the end of the pair
+        if (letter.upper() == p1.upper()):
+            # Return the first letter.
+            return(p0.upper())
+
+    # If none of that happens just
+    # return the input letter.
+    return letter
 
 # Returns a Ceaser Cipher with
 # the new alpabet shifted by the
@@ -50,7 +109,7 @@ def Swap(letter, offset = 1):
         letter = newAlph[pos]
 
     # Return the new letter.
-    return(letter)
+    return letter
 ##
 
 # This is the main loop.
@@ -70,6 +129,11 @@ def Enigma():
     # Parse each character.
     # The transformation will skip non-letters.
     for letter in message:
+
+        # Check for plugboard
+        # substitutions on the inupt.
+        letter=Trade(letter)
+
         # If more than one rotor was used
         if hasattr(Rotors, "__len__"):
             # "Pass through" each rotor.
@@ -84,6 +148,11 @@ def Enigma():
             # If only one rotor was used
             # then just do one swap.
             letter = Swap(letter, Rotors)
+
+        # Check for plugboard
+        # substitutions on the outupt.
+        letter=Trade(letter)
+
         # Add the character to the new string.
         new_message += letter
 
