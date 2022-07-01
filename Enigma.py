@@ -25,6 +25,8 @@ from collections import deque
 # Enter any number of numbers here.
 Rotors = (8, 6, 16, -5, 3)
 
+Run = True # The program stops when this is false.
+
 # Returns a Ceaser Cipher with
 # the new alpabet shifted by the
 # amount the rotor was turned.
@@ -32,14 +34,14 @@ def Swap(letter, offset = 1):
     # Only transform letters
     if letter.isalpha():
 
-        # Using a reversed alphabet was actually 
+        # Using a reversed alphabet was actually
         # key to making the encryption revesible.
         newAlph = deque(ALPHABET[::-1])
 
         # Apply the specifed rotor shift.
         newAlph.rotate(offset)
 
-        # Count to the position of the 
+        # Count to the position of the
         # orignal (capital) letter.
         pos = ALPHABET.index(letter.upper())
 
@@ -65,7 +67,7 @@ def Enigma():
     # This will hold the new message
     new_message = ''
 
-    # Parse each character. 
+    # Parse each character.
     # The transformation will skip non-letters.
     for letter in message:
         # If more than one rotor was used
