@@ -85,6 +85,7 @@ def Trade(letter):
     # If none of that happens just
     # return the input letter.
     return letter
+##
 
 # Returns a Ceaser Cipher with
 # the new alpabet shifted by the
@@ -112,6 +113,25 @@ def Swap(letter, offset = 1):
     return letter
 ##
 
+# Advance each rotor by one.
+def Roll(rotors):
+    # Convert to list to
+    # allow assignment.
+    rotors = list(rotors)
+
+    # Take each rotor number.
+    for idx, num in enumerate(rotors):
+        # Add 1 to it.
+        rotors[idx] += 1
+
+    # Convert back to
+    # expected format.
+    rotors = tuple(rotors)
+
+    # Return the new position(s).
+    return rotors
+##
+
 # This is the main loop.
 def Enigma():
     # Prompt for text.
@@ -126,6 +146,12 @@ def Enigma():
     # This will hold the new message
     new_message = ''
 
+    # Create a copy of the rotors.
+    rotors=Rotors
+    # These numbers will advance with
+    # Each letter, but will be discarded
+    # when the output is given.
+
     # Parse each character.
     # The transformation will skip non-letters.
     for letter in message:
@@ -135,19 +161,20 @@ def Enigma():
         letter=Trade(letter)
 
         # If more than one rotor was used
-        if hasattr(Rotors, "__len__"):
+        if hasattr(rotors, "__len__"):
             # "Pass through" each rotor.
-            letter = Swap(letter, Rotors[0])
-            for num in Rotors:
-                if num > 0:
-                    # Reflect the position every time
-                    # to make encryption revesible.
-                    letter = Swap(letter, int(len(ALPHABET)/2))
-                    letter = Swap(letter, num)
+            # First the first.
+            letter = Swap(letter, rotors[0])
+            # Then the rest after the reflections.
+            for num in rotors[1:]:
+                # Reflect the position every time
+                # to make encryption revesible.
+                letter = Swap(letter, int(len(ALPHABET)/2))
+                letter = Swap(letter, num)
         else:
             # If only one rotor was used
             # then just do one swap.
-            letter = Swap(letter, Rotors)
+            letter = Swap(letter, rotors)
 
         # Check for plugboard
         # substitutions on the outupt.
@@ -155,6 +182,9 @@ def Enigma():
 
         # Add the character to the new string.
         new_message += letter
+
+        # Advance the rotors
+        rotors = Roll(rotors)
 
     # Print the new message.
     print(new_message)
